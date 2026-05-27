@@ -42,6 +42,7 @@ import { getCredentials, credentialStore } from "./utils/client.js";
 import { logger } from "./utils/logger.js";
 import { setServerRef } from "./utils/server-ref.js";
 import { TOOL_CATEGORIES, findDomainForTool, routeIntent } from "./utils/categories.js";
+import { annotate } from "./annotate-tool.js";
 
 // Navigation state removed - all tools are always available for direct-install compatibility
 
@@ -227,11 +228,11 @@ async function getAllDomainTools(): Promise<Tool[]> {
 // Handle ListTools requests - always returns ALL tools
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   if (isLazyLoadingEnabled()) {
-    return { tools: metaTools };
+    return { tools: annotate(metaTools, "KnowBe4") };
   }
 
   const domainTools = await getAllDomainTools();
-  return { tools: [navigateTool, backTool, statusTool, ...domainTools] };
+  return { tools: annotate([navigateTool, backTool, statusTool, ...domainTools], "KnowBe4") };
 });
 
 // Handle CallTool requests

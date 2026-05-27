@@ -47,9 +47,10 @@
     },
     "threatlocker_base_url": {
       "type": "string",
-      "title": "Portal API base URL (optional)",
-      "description": "Optional. Leave blank to use the vendor default (https://portalapi.g.threatlocker.com/portalapi). Only set if your tenant lives on a non-default shard (e.g. https://portalapi.eu.threatlocker.com/portalapi). Find yours at https://threatlocker.kb.help/locating-your-organizations-instance/",
-      "required": false
+      "title": "Portal API base URL",
+      "description": "Prefilled with the global default. Override for non-default shards (e.g. https://portalapi.eu.threatlocker.com/portalapi). Locate yours at https://threatlocker.kb.help/locating-your-organizations-instance/",
+      "required": false,
+      "default": "https://portalapi.g.threatlocker.com/portalapi"
     }
   },
   "compatibility": {

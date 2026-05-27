@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, titled } from "./annotations.js";
 
 export function registerMemberTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerMemberTools(server: McpServer, client: CwManageClient) {
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search members", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/system/members", {
         conditions,
@@ -29,6 +31,7 @@ export function registerMemberTools(server: McpServer, client: CwManageClient) {
     {
       id: z.number().describe("Member ID"),
     },
+    titled("CW Manage: get member", READ),
     async ({ id }) => {
       const result = await client.get(`/system/members/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

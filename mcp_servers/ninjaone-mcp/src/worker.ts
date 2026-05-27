@@ -15,6 +15,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { annotate } from "./annotate-tool.js";
 
 export interface Env {
   NINJAONE_CLIENT_ID?: string;
@@ -67,7 +68,7 @@ function createMcpServer(): Server {
       },
     };
 
-    return { tools: [navigateTool, statusTool] };
+    return { tools: annotate([navigateTool, statusTool], "NinjaOne") };
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {

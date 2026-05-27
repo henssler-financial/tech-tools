@@ -51,9 +51,19 @@ export const DEFAULT_RATE_LIMIT_CONFIG: RateLimitConfig = {
 };
 
 /**
- * OAuth scopes available for NinjaOne
+ * OAuth scopes available for NinjaOne. `offline_access` is required for
+ * authorization_code refresh-token issuance.
  */
-export type NinjaOneScope = 'monitoring' | 'management' | 'control';
+export type NinjaOneScope = 'monitoring' | 'management' | 'control' | 'offline_access';
+
+/**
+ * External access-token supplier. When set, the SDK skips its own
+ * client_credentials grant and asks the supplier for a Bearer token on every
+ * request. The supplier owns token storage, refresh, and expiry tracking —
+ * typical use is a separate authorization_code/PKCE flow living outside the
+ * SDK.
+ */
+export type TokenSupplier = () => Promise<string>;
 
 /**
  * Configuration for the NinjaOne client
@@ -61,8 +71,8 @@ export type NinjaOneScope = 'monitoring' | 'management' | 'control';
 export interface NinjaOneConfig {
   /** OAuth 2.0 Client ID */
   clientId: string;
-  /** OAuth 2.0 Client Secret */
-  clientSecret: string;
+  /** OAuth 2.0 Client Secret. Required for client_credentials flow; ignored when tokenSupplier is set. */
+  clientSecret?: string;
   /** Region for the API endpoint (default: 'us') */
   region?: NinjaOneRegion;
   /** Explicit base URL (alternative to region) */
@@ -71,6 +81,8 @@ export interface NinjaOneConfig {
   scopes?: NinjaOneScope[];
   /** Rate limiting configuration */
   rateLimit?: Partial<RateLimitConfig>;
+  /** External token supplier — overrides the built-in client_credentials grant */
+  tokenSupplier?: TokenSupplier;
 }
 
 /**
@@ -82,6 +94,7 @@ export interface ResolvedConfig {
   baseUrl: string;
   scopes: NinjaOneScope[];
   rateLimit: RateLimitConfig;
+  tokenSupplier?: TokenSupplier;
 }
 
 /**
@@ -104,12 +117,13 @@ export function resolveConfig(config: NinjaOneConfig): ResolvedConfig {
 
   return {
     clientId: config.clientId,
-    clientSecret: config.clientSecret,
+    clientSecret: config.clientSecret ?? '',
     baseUrl,
     scopes: config.scopes ?? ['monitoring', 'management'],
     rateLimit: {
       ...DEFAULT_RATE_LIMIT_CONFIG,
       ...config.rateLimit,
     },
+    tokenSupplier: config.tokenSupplier,
   };
 }

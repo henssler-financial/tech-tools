@@ -48,9 +48,10 @@
     },
     "vanta_base_url": {
       "type": "string",
-      "title": "Vanta API base URL (optional)",
-      "description": "Optional. Leave blank to use the vendor default (https://api.vanta.com/v1). Only set for staging/sovereign shards.",
-      "required": false
+      "title": "Vanta API base URL",
+      "description": "Prefilled with the production default. Override only for staging/sovereign shards.",
+      "required": false,
+      "default": "https://api.vanta.com/v1"
     }
   },
   "compatibility": {

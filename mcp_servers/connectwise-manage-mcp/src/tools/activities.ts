@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, WRITE_CREATE, titled } from "./annotations.js";
 
 export function registerActivityTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerActivityTools(server: McpServer, client: CwManageClient)
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search activities", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/sales/activities", {
         conditions,
@@ -29,6 +31,7 @@ export function registerActivityTools(server: McpServer, client: CwManageClient)
     {
       id: z.number().describe("Activity ID"),
     },
+    titled("CW Manage: get activity", READ),
     async ({ id }) => {
       const result = await client.get(`/sales/activities/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -48,6 +51,7 @@ export function registerActivityTools(server: McpServer, client: CwManageClient)
       dateStart: z.string().optional().describe("Start date (ISO 8601)"),
       dateEnd: z.string().optional().describe("End date (ISO 8601)"),
     },
+    titled("CW Manage: create activity", WRITE_CREATE),
     async ({ name, typeId, companyId, contactId, memberId, notes, dateStart, dateEnd }) => {
       const body: Record<string, unknown> = { name };
       if (typeId) body.type = { id: typeId };

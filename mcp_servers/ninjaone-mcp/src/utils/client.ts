@@ -8,6 +8,7 @@
 import type { NinjaOneClient } from "node-ninjaone";
 import { isValidRegion, getBaseUrlForRegion, type NinjaOneRegion } from "./types.js";
 import { logger } from "./logger.js";
+import { UserTokenManager } from "../oauth/token-manager.js";
 
 // Strip unresolved MCP host template placeholders (e.g. "${user_config.x}")
 // and whitespace-only values so optional env vars fall through to their defaults.
@@ -16,11 +17,27 @@ const isUnresolvedPlaceholder = (v: string | undefined): boolean =>
 const cleanEnv = (v: string | undefined): string =>
   !v || isUnresolvedPlaceholder(v) ? "" : v.trim();
 
+export type NinjaOneAuthMode = "client_credentials" | "user";
+
 export interface NinjaOneCredentials {
   clientId: string;
   clientSecret: string;
   region: NinjaOneRegion;
   baseUrl: string;
+  authMode: NinjaOneAuthMode;
+}
+
+let _userTokenManager: UserTokenManager | null = null;
+
+export function getUserTokenManager(): UserTokenManager | null {
+  return _userTokenManager;
+}
+
+export function ensureUserTokenManager(creds: NinjaOneCredentials): UserTokenManager {
+  if (!_userTokenManager) {
+    _userTokenManager = new UserTokenManager(creds.baseUrl, creds.clientId, creds.region);
+  }
+  return _userTokenManager;
 }
 
 let _client: NinjaOneClient | null = null;
@@ -88,12 +105,15 @@ export function getCredentials(): NinjaOneCredentials | null {
   const clientId = cleanEnv(process.env.NINJAONE_CLIENT_ID);
   const clientSecret = cleanEnv(process.env.NINJAONE_CLIENT_SECRET);
   const regionEnv = (cleanEnv(process.env.NINJAONE_REGION) || "us").toLowerCase();
+  const authModeRaw = cleanEnv(process.env.NINJAONE_AUTH_MODE).toLowerCase();
+  const authMode: NinjaOneAuthMode = authModeRaw === "user" ? "user" : "client_credentials";
 
-  if (!clientId || !clientSecret) {
-    logger.warn("Missing credentials", {
-      hasClientId: !!clientId,
-      hasClientSecret: !!clientSecret,
-    });
+  if (!clientId) {
+    logger.warn("Missing NINJAONE_CLIENT_ID");
+    return null;
+  }
+  if (authMode === "client_credentials" && !clientSecret) {
+    logger.warn("Missing NINJAONE_CLIENT_SECRET (required for client_credentials mode)");
     return null;
   }
 
@@ -105,7 +125,7 @@ export function getCredentials(): NinjaOneCredentials | null {
   const region = regionEnv as NinjaOneRegion;
   const baseUrl = getBaseUrlForRegion(region);
 
-  return { clientId, clientSecret, region, baseUrl };
+  return { clientId, clientSecret, region, baseUrl, authMode };
 }
 
 /**
@@ -139,12 +159,18 @@ export async function getClient(): Promise<NinjaOneClient> {
   if (!_client) {
     try {
       const { NinjaOneClient } = await import("node-ninjaone");
-      logger.info("Creating NinjaOne client", { region: creds.region, baseUrl: creds.baseUrl });
-      _client = new NinjaOneClient({
+      logger.info("Creating NinjaOne client", { region: creds.region, baseUrl: creds.baseUrl, authMode: creds.authMode });
+      const clientConfig: any = {
         clientId: creds.clientId,
-        clientSecret: creds.clientSecret,
         baseUrl: creds.baseUrl,
-      });
+      };
+      if (creds.authMode === "user") {
+        const manager = ensureUserTokenManager(creds);
+        clientConfig.tokenSupplier = () => manager.getAccessToken();
+      } else {
+        clientConfig.clientSecret = creds.clientSecret;
+      }
+      _client = new NinjaOneClient(clientConfig);
       _credentials = creds;
     } catch (error) {
       logger.error("Failed to create NinjaOne client", {

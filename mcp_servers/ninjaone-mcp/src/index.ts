@@ -43,11 +43,15 @@ import {
   clearClientOverride,
   setCredentialOverrides,
   clearCredentialOverrides,
+  ensureUserTokenManager,
   type NinjaOneCredentials,
 } from "./utils/client.js";
 import { logger } from "./utils/logger.js";
 import { setServerRef } from "./utils/server-ref.js";
 import { registerPromptHandlers } from "./prompts.js";
+import { annotate } from "./annotate-tool.js";
+import { runUserFlow, DEFAULT_SCOPES, REDIRECT_URI } from "./oauth/user-flow.js";
+import { loadTokens, clearTokens, storagePath } from "./oauth/token-store.js";
 
 /**
  * Collect all domain tools at startup for flattened tool listing
@@ -121,6 +125,30 @@ const statusTool: Tool = {
 };
 
 /**
+ * Auth tools — only meaningful when NINJAONE_AUTH_MODE=user.
+ */
+const signInTool: Tool = {
+  name: "ninjaone_sign_in",
+  description:
+    "Start the browser-based NinjaOne sign-in flow (authorization_code + PKCE). Opens your default browser, listens on http://127.0.0.1:53682/oauth/callback for the redirect, exchanges the code for tokens, and stores the refresh token to disk. Requires NINJAONE_AUTH_MODE=user. The OAuth app at NinjaOne must list http://127.0.0.1:53682/oauth/callback as an allowed redirect URI.",
+  inputSchema: { type: "object", properties: {} },
+};
+
+const signOutTool: Tool = {
+  name: "ninjaone_sign_out",
+  description:
+    "Forget the stored NinjaOne refresh token (deletes ~/.ai-tech-toolkit/ninjaone-tokens.json). After sign-out you must call ninjaone_sign_in again before any read/write tools will work.",
+  inputSchema: { type: "object", properties: {} },
+};
+
+const authStatusTool: Tool = {
+  name: "ninjaone_auth_status",
+  description:
+    "Report the current auth mode and whether a usable user-OAuth token is present. Use to debug 'not signed in' errors.",
+  inputSchema: { type: "object", properties: {} },
+};
+
+/**
  * Create a fresh MCP server instance with all handlers registered.
  * Called once for stdio, or per-request for HTTP transport.
  *
@@ -151,7 +179,12 @@ async function createMcpServer(credentialOverrides?: NinjaOneCredentials): Promi
    * Handle ListTools requests - always returns ALL tools
    */
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return { tools: [navigateTool, statusTool, ...allDomainTools] };
+    return {
+      tools: annotate(
+        [navigateTool, statusTool, signInTool, signOutTool, authStatusTool, ...allDomainTools],
+        "NinjaOne",
+      ),
+    };
   });
 
   /**
@@ -207,7 +240,7 @@ async function createMcpServer(credentialOverrides?: NinjaOneCredentials): Promi
       if (name === "ninjaone_status") {
         const creds = getCredentials();
         const credStatus = creds
-          ? `Configured (region: ${creds.region}, base URL: ${creds.baseUrl})`
+          ? `Configured (region: ${creds.region}, base URL: ${creds.baseUrl}, auth: ${creds.authMode})`
           : "NOT CONFIGURED - Please set environment variables";
 
         return {
@@ -218,6 +251,76 @@ async function createMcpServer(credentialOverrides?: NinjaOneCredentials): Promi
             },
           ],
         };
+      }
+
+      if (name === "ninjaone_sign_in") {
+        const creds = getCredentials();
+        if (!creds) {
+          return {
+            content: [{ type: "text", text: "Set NINJAONE_CLIENT_ID, NINJAONE_REGION, and NINJAONE_AUTH_MODE=user before signing in." }],
+            isError: true,
+          };
+        }
+        if (creds.authMode !== "user") {
+          return {
+            content: [{ type: "text", text: `Auth mode is "${creds.authMode}". Set NINJAONE_AUTH_MODE=user to enable browser sign-in.` }],
+            isError: true,
+          };
+        }
+        try {
+          let authorizeUrl = "";
+          const tokens = await runUserFlow({
+            baseUrl: creds.baseUrl,
+            clientId: creds.clientId,
+            region: creds.region,
+            scopes: DEFAULT_SCOPES,
+            onAuthorizeUrl: (u) => { authorizeUrl = u; },
+          });
+          ensureUserTokenManager(creds).setTokens(tokens);
+          return {
+            content: [{
+              type: "text",
+              text: `Signed in to NinjaOne (region: ${creds.region}). Refresh token stored at ${storagePath()}.\n\nIf the browser did not open, manually visit:\n${authorizeUrl}`,
+            }],
+          };
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          return {
+            content: [{
+              type: "text",
+              text: `Sign-in failed: ${msg}\n\nVerify your NinjaOne OAuth app includes the redirect URI ${REDIRECT_URI} and the scopes ${DEFAULT_SCOPES.join(" ")}.`,
+            }],
+            isError: true,
+          };
+        }
+      }
+
+      if (name === "ninjaone_sign_out") {
+        await clearTokens();
+        return { content: [{ type: "text", text: `Cleared stored NinjaOne tokens.` }] };
+      }
+
+      if (name === "ninjaone_auth_status") {
+        const creds = getCredentials();
+        const stored = await loadTokens().catch(() => null);
+        const lines = [
+          `Auth mode: ${creds?.authMode ?? "unknown"}`,
+          `Region: ${creds?.region ?? "unknown"}`,
+          `Storage: ${storagePath()}`,
+        ];
+        if (creds?.authMode === "user") {
+          if (!stored) {
+            lines.push(`Status: NOT SIGNED IN — call ninjaone_sign_in to authenticate.`);
+          } else {
+            const remainingMs = stored.expiresAt - Date.now();
+            const human = remainingMs > 0 ? `${Math.floor(remainingMs / 60000)}m remaining` : `EXPIRED (refresh will mint a new one on next call)`;
+            const regionMatch = stored.region === creds.region ? "region matches" : `region MISMATCH (stored=${stored.region}, current=${creds.region})`;
+            lines.push(`Status: signed in — access token ${human}, scope="${stored.scope}", ${regionMatch}`);
+          }
+        } else {
+          lines.push(`Status: using client_credentials. Set NINJAONE_AUTH_MODE=user to switch to interactive sign-in.`);
+        }
+        return { content: [{ type: "text", text: lines.join("\n") }] };
       }
 
       // Route to appropriate domain handler based on tool name prefix
@@ -340,6 +443,7 @@ async function startHttpTransport(): Promise<void> {
           clientSecret,
           region: validRegion,
           baseUrl: getBaseUrlForRegion(validRegion),
+          authMode: "client_credentials",
         };
       }
 

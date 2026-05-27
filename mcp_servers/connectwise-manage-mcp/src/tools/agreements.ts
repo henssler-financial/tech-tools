@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, titled } from "./annotations.js";
 
 export function registerAgreementTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerAgreementTools(server: McpServer, client: CwManageClient
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search agreements", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/finance/agreements", {
         conditions,
@@ -29,6 +31,7 @@ export function registerAgreementTools(server: McpServer, client: CwManageClient
     {
       id: z.number().describe("Agreement ID"),
     },
+    titled("CW Manage: get agreement", READ),
     async ({ id }) => {
       const result = await client.get(`/finance/agreements/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -43,6 +46,7 @@ export function registerAgreementTools(server: McpServer, client: CwManageClient
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: get agreement additions", READ),
     async ({ agreementId, page, pageSize }) => {
       const result = await client.get(`/finance/agreements/${agreementId}/additions`, {
         page: page ?? 1,
@@ -61,6 +65,7 @@ export function registerAgreementTools(server: McpServer, client: CwManageClient
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by (e.g. 'id desc')"),
     },
+    titled("CW Manage: search invoices", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/finance/invoices", {
         conditions,
@@ -78,6 +83,7 @@ export function registerAgreementTools(server: McpServer, client: CwManageClient
     {
       id: z.number().describe("Invoice ID"),
     },
+    titled("CW Manage: get invoice", READ),
     async ({ id }) => {
       const result = await client.get(`/finance/invoices/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

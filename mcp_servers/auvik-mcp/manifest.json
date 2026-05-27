@@ -56,9 +56,10 @@
     },
     "auvik_region": {
       "type": "string",
-      "title": "Auvik Region (optional)",
-      "description": "Optional. Leave blank to use the vendor default (us1 → https://auvikapi.us1.my.auvik.com). Valid values: us1, us2, us3, us4, eu1, eu2, au1, ca1. Only set for non-US1 tenants.",
-      "required": false
+      "title": "Auvik Region",
+      "description": "Region code that auto-derives the base URL. Default us1 → https://auvikapi.us1.my.auvik.com/v1. Valid values: us1, us2, us3, us4, eu1, eu2, au1, ca1. Change only if your Auvik tenant is on a non-US1 shard.",
+      "required": false,
+      "default": "us1"
     }
   },
   "compatibility": {

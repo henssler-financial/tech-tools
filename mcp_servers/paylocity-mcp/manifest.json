@@ -56,15 +56,17 @@
     },
     "paylocity_base_url": {
       "type": "string",
-      "title": "Paylocity API base URL (optional)",
-      "description": "Optional. Leave blank to use the vendor default (https://api.paylocity.com). Only set for staging/sovereign shards.",
-      "required": false
+      "title": "Paylocity API base URL",
+      "description": "Prefilled with the production default. Override only for staging/sovereign shards. Ignored if you only need the sandbox toggle below.",
+      "required": false,
+      "default": "https://api.paylocity.com"
     },
     "paylocity_sandbox": {
-      "type": "string",
-      "title": "Use sandbox host (optional)",
-      "description": "Set to \"true\" to use https://apisandbox.paylocity.com instead of production. Ignored if paylocity_base_url is set.",
-      "required": false
+      "type": "boolean",
+      "title": "Use sandbox host",
+      "description": "Routes all calls to https://apisandbox.paylocity.com instead of production. Ignored when paylocity_base_url is set to a non-default value.",
+      "required": false,
+      "default": false
     }
   },
   "compatibility": {

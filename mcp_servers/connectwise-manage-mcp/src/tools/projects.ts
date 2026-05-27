@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, WRITE_CREATE, titled } from "./annotations.js";
 
 export function registerProjectTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search projects", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/project/projects", {
         conditions,
@@ -29,6 +31,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
     {
       id: z.number().describe("Project ID"),
     },
+    titled("CW Manage: get project", READ),
     async ({ id }) => {
       const result = await client.get(`/project/projects/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -45,6 +48,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by (e.g. 'id desc')"),
     },
+    titled("CW Manage: search project tickets", READ),
     async ({ projectId, conditions, page, pageSize, orderBy }) => {
       const conditionParts: string[] = [];
       if (projectId !== undefined) conditionParts.push(`project/id=${projectId}`);
@@ -66,6 +70,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
     {
       id: z.number().describe("Project ticket ID"),
     },
+    titled("CW Manage: get project ticket", READ),
     async ({ id }) => {
       const result = await client.get(`/project/tickets/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -80,6 +85,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: get project ticket notes", READ),
     async ({ id, page, pageSize }) => {
       try {
         const result = await client.get(`/project/tickets/${id}/allNotes`, {
@@ -112,6 +118,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
       internalAnalysisFlag: z.boolean().optional().describe("Mark as internal analysis only (default: false)"),
       resolutionFlag: z.boolean().optional().describe("Mark as resolution note (default: false)"),
     },
+    titled("CW Manage: add project ticket note", WRITE_CREATE),
     async ({ id, text, detailDescriptionFlag, internalAnalysisFlag, resolutionFlag }) => {
       const body: Record<string, unknown> = { text };
       if (detailDescriptionFlag !== undefined) body.detailDescriptionFlag = detailDescriptionFlag;
@@ -135,6 +142,7 @@ export function registerProjectTools(server: McpServer, client: CwManageClient) 
       description: z.string().optional().describe("Project description"),
       managerId: z.number().optional().describe("Project manager member ID"),
     },
+    titled("CW Manage: create project", WRITE_CREATE),
     async ({ name, boardId, companyId, estimatedStart, estimatedEnd, description, managerId }) => {
       const body: Record<string, unknown> = {
         name,

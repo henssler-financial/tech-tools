@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, WRITE_CREATE, WRITE_UPDATE, titled } from "./annotations.js";
 
 export function registerCompanyTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerCompanyTools(server: McpServer, client: CwManageClient) 
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search companies", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/company/companies", {
         conditions,
@@ -29,6 +31,7 @@ export function registerCompanyTools(server: McpServer, client: CwManageClient) 
     {
       id: z.number().describe("Company ID"),
     },
+    titled("CW Manage: get company", READ),
     async ({ id }) => {
       const result = await client.get(`/company/companies/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -51,6 +54,7 @@ export function registerCompanyTools(server: McpServer, client: CwManageClient) 
       phoneNumber: z.string().optional().describe("Phone number"),
       website: z.string().optional().describe("Website URL"),
     },
+    titled("CW Manage: create company", WRITE_CREATE),
     async ({ name, identifier, typeIds, statusId, addressLine1, city, state, zip, country, phoneNumber, website }) => {
       const body: Record<string, unknown> = { name, identifier };
       if (typeIds?.length) body.types = typeIds.map((id) => ({ id }));
@@ -83,6 +87,7 @@ export function registerCompanyTools(server: McpServer, client: CwManageClient) 
         )
         .describe("Array of JSON Patch operations"),
     },
+    titled("CW Manage: update company", WRITE_UPDATE),
     async ({ id, operations }) => {
       const result = await client.patch(`/company/companies/${id}`, operations);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

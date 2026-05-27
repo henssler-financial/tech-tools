@@ -1,11 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient, getConfig } from "../api-client.js";
+import { READ, titled } from "./annotations.js";
 
 export function registerHealthTools(server: McpServer, client: CwManageClient) {
   server.tool(
     "cw_status",
     "Show ConnectWise Manage MCP server configuration status: which environment variables are set and what base URL is in use. Always works, even with missing credentials.",
     {},
+    titled("CW Manage: status", READ),
     async () => {
       const config = getConfig();
       const status = {
@@ -27,6 +29,7 @@ export function registerHealthTools(server: McpServer, client: CwManageClient) {
     "cw_test_connection",
     "Verify ConnectWise Manage API connectivity by fetching system info. Returns API version and licensing details. Use to confirm credentials are working.",
     {},
+    titled("CW Manage: test connection", READ),
     async () => {
       try {
         const result = await client.get("/system/info");

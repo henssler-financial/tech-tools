@@ -6,6 +6,7 @@ import { getCredentials, resetClient } from './utils/client.js';
 import { logger } from './utils/logger.js';
 import { setServerRef } from './utils/server-ref.js';
 import type { DomainName } from './utils/types.js';
+import { annotate } from './annotate-tool.js';
 
 export function createMcpServer(): Server {
   const server = new Server(
@@ -28,7 +29,7 @@ export function createMcpServer(): Server {
       const handler = await getDomainHandler(domain);
       allTools.push(...handler.getTools());
     }
-    return { tools: allTools };
+    return { tools: annotate(allTools, 'ThreatLocker') };
   });
 
   // Route tool calls

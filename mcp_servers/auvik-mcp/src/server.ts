@@ -1,6 +1,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { toMcpError } from './errors.js';
+import { annotate } from './annotate-tool.js';
 
 // Status and navigation tools
 import { statusTool, handleStatus } from './tools/status.js';
@@ -145,7 +146,7 @@ export function createServer(): Server {
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return { tools: TOOLS };
+    return { tools: annotate(TOOLS, 'Auvik') };
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, WRITE_CREATE, WRITE_UPDATE, titled } from "./annotations.js";
 
 export function registerTicketTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -21,6 +22,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
         .optional()
         .describe("Field to order by (e.g. 'id desc')"),
     },
+    titled("CW Manage: search tickets", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/service/tickets", {
         conditions,
@@ -38,6 +40,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
     {
       id: z.number().describe("Ticket ID"),
     },
+    titled("CW Manage: get ticket", READ),
     async ({ id }) => {
       const result = await client.get(`/service/tickets/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -58,6 +61,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
       subTypeId: z.number().optional().describe("SubType ID"),
       initialDescription: z.string().optional().describe("Initial ticket description"),
     },
+    titled("CW Manage: create ticket", WRITE_CREATE),
     async ({ summary, boardId, companyId, contactId, statusId, priorityId, typeId, subTypeId, initialDescription }) => {
       const body: Record<string, unknown> = { summary };
       if (boardId) body.board = { id: boardId };
@@ -89,6 +93,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
         )
         .describe("Array of JSON Patch operations"),
     },
+    titled("CW Manage: update ticket", WRITE_UPDATE),
     async ({ id, operations }) => {
       const result = await client.patch(`/service/tickets/${id}`, operations);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -103,6 +108,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: get ticket notes", READ),
     async ({ id, page, pageSize }) => {
       try {
         const result = await client.get(`/service/tickets/${id}/allNotes`, {
@@ -136,6 +142,7 @@ export function registerTicketTools(server: McpServer, client: CwManageClient) {
       resolutionFlag: z.boolean().optional().describe("Mark as resolution note (default: false)"),
       customerUpdatedFlag: z.boolean().optional().describe("Flag that the customer was updated (default: false)"),
     },
+    titled("CW Manage: add ticket note", WRITE_CREATE),
     async ({ id, text, detailDescriptionFlag, internalAnalysisFlag, resolutionFlag, customerUpdatedFlag }) => {
       const body: Record<string, unknown> = { text };
       if (detailDescriptionFlag !== undefined) body.detailDescriptionFlag = detailDescriptionFlag;

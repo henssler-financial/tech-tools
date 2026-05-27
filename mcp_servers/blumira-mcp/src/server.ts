@@ -6,6 +6,7 @@ import { getCredentials } from './utils/client.js';
 import { elicitCredentials } from './elicitation/forms.js';
 import { logger } from './utils/logger.js';
 import type { DomainName } from './utils/types.js';
+import { annotate } from './annotate-tool.js';
 
 export function createServer(): Server {
   const server = new Server(
@@ -24,11 +25,11 @@ export function createServer(): Server {
     const state = getState(sessionId);
 
     if (!state.currentDomain) {
-      return { tools: getNavigationTools() };
+      return { tools: annotate(getNavigationTools(), 'Blumira') };
     }
 
     const handler = await getDomainHandler(state.currentDomain);
-    return { tools: [...handler.getTools(), getBackTool()] };
+    return { tools: annotate([...handler.getTools(), getBackTool()], 'Blumira') };
   });
 
   // Route tool calls

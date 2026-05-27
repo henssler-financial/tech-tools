@@ -39,9 +39,10 @@
     },
     "region": {
       "type": "string",
-      "title": "Region (optional)",
-      "description": "Optional. Leave blank to use the vendor default (us → https://us.api.knowbe4.com). Valid values: us, eu (https://eu.api.knowbe4.com), ca, uk, de. Only set if your KnowBe4 account is on a non-US region.",
-      "required": false
+      "title": "Region",
+      "description": "Region code that auto-derives the base URL. Default us → https://us.api.knowbe4.com. Valid values: us, eu (https://eu.api.knowbe4.com), ca, uk, de. Change only if your KnowBe4 account is on a non-US shard.",
+      "required": false,
+      "default": "us"
     }
   },
   "compatibility": {

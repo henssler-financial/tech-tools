@@ -15,6 +15,7 @@ import { Logger } from '../utils/logger.js';
 import { McpServerConfig } from '../types/index.js';
 import { EnvironmentConfig, parseCredentialsFromHeaders } from '../utils/config.js';
 import { CippToolHandler } from '../handlers/tool.handler.js';
+import { annotate } from '../annotate-tool.js';
 
 export class CippMcpServer {
   private server: Server;
@@ -103,7 +104,7 @@ Tool categories:
   private setupHandlers(server: Server): void {
     server.setRequestHandler(ListToolsRequestSchema, async () => {
       this.logger.debug('Handling list tools request');
-      return { tools: this.toolHandler.getToolDefinitions() };
+      return { tools: annotate(this.toolHandler.getToolDefinitions(), 'CIPP') };
     });
 
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -236,7 +237,7 @@ Tool categories:
 
         // Wire up handlers using the (possibly per-request) toolHandler
         server.setRequestHandler(ListToolsRequestSchema, async () => ({
-          tools: toolHandler.getToolDefinitions(),
+          tools: annotate(toolHandler.getToolDefinitions(), 'CIPP'),
         }));
 
         server.setRequestHandler(CallToolRequestSchema, async (request) => {

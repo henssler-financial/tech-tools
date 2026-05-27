@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, titled } from "./annotations.js";
 
 export function registerConfigurationTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerConfigurationTools(server: McpServer, client: CwManageCl
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search configurations", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/company/configurations", {
         conditions,
@@ -29,6 +31,7 @@ export function registerConfigurationTools(server: McpServer, client: CwManageCl
     {
       id: z.number().describe("Configuration item ID"),
     },
+    titled("CW Manage: get configuration", READ),
     async ({ id }) => {
       const result = await client.get(`/company/configurations/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };

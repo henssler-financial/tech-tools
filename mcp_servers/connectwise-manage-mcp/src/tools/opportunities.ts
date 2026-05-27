@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, titled } from "./annotations.js";
 
 export function registerOpportunityTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerOpportunityTools(server: McpServer, client: CwManageClie
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by (e.g. 'id desc')"),
     },
+    titled("CW Manage: search opportunities", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/sales/opportunities", {
         conditions,
@@ -29,6 +31,7 @@ export function registerOpportunityTools(server: McpServer, client: CwManageClie
     {
       id: z.number().describe("Opportunity ID"),
     },
+    titled("CW Manage: get opportunity", READ),
     async ({ id }) => {
       const result = await client.get(`/sales/opportunities/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -43,6 +46,7 @@ export function registerOpportunityTools(server: McpServer, client: CwManageClie
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: search opportunity forecasts", READ),
     async ({ opportunityId, page, pageSize }) => {
       const result = await client.get(`/sales/opportunities/${opportunityId}/forecast`, {
         page: page ?? 1,
@@ -60,6 +64,7 @@ export function registerOpportunityTools(server: McpServer, client: CwManageClie
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: search opportunity notes", READ),
     async ({ opportunityId, page, pageSize }) => {
       const result = await client.get(`/sales/opportunities/${opportunityId}/notes`, {
         page: page ?? 1,
@@ -77,6 +82,7 @@ export function registerOpportunityTools(server: McpServer, client: CwManageClie
       page: z.number().optional().describe("Page number (default: 1)"),
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
     },
+    titled("CW Manage: search sales stages", READ),
     async ({ conditions, page, pageSize }) => {
       const result = await client.get("/sales/stages", {
         conditions,

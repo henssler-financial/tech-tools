@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CwManageClient } from "../api-client.js";
+import { READ, WRITE_CREATE, titled } from "./annotations.js";
 
 export function registerContactTools(server: McpServer, client: CwManageClient) {
   server.tool(
@@ -12,6 +13,7 @@ export function registerContactTools(server: McpServer, client: CwManageClient) 
       pageSize: z.number().optional().describe("Results per page (default: 25, max: 1000)"),
       orderBy: z.string().optional().describe("Field to order by"),
     },
+    titled("CW Manage: search contacts", READ),
     async ({ conditions, page, pageSize, orderBy }) => {
       const result = await client.get("/company/contacts", {
         conditions,
@@ -29,6 +31,7 @@ export function registerContactTools(server: McpServer, client: CwManageClient) 
     {
       id: z.number().describe("Contact ID"),
     },
+    titled("CW Manage: get contact", READ),
     async ({ id }) => {
       const result = await client.get(`/company/contacts/${id}`);
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -46,6 +49,7 @@ export function registerContactTools(server: McpServer, client: CwManageClient) 
       phone: z.string().optional().describe("Phone number"),
       title: z.string().optional().describe("Job title"),
     },
+    titled("CW Manage: create contact", WRITE_CREATE),
     async ({ firstName, lastName, companyId, email, phone, title }) => {
       const body: Record<string, unknown> = {
         firstName,

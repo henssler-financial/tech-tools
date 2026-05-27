@@ -50,6 +50,12 @@ export class AuthManager {
    * Get a valid access token, acquiring or refreshing as needed
    */
   async getToken(): Promise<string> {
+    // External supplier path (e.g. user authorization_code flow handled outside
+    // the SDK). The supplier is responsible for its own caching and refresh.
+    if (this.config.tokenSupplier) {
+      return this.config.tokenSupplier();
+    }
+
     // If we have a valid token that's not near expiry, return it
     if (this.token && !this.isTokenNearExpiry(this.token)) {
       return this.token.accessToken;
