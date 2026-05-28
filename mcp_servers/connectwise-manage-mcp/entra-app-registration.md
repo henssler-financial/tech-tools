@@ -137,10 +137,7 @@ AZURE_REQUIRED_ROLE=CWM.Access
 The redirect URI `https://claude.ai/api/mcp/auth_callback` is not registered, or it's registered under the wrong platform (Web or SPA instead of Mobile and desktop applications). Delete it from the wrong platform and re-add it under Mobile and desktop applications.
 
 **Token validation fails — logs show audience mismatch**
-Check the `[auth]` log line for `tokenAudience`. Set `AZURE_AUDIENCE` in `.env` to exactly match that value.
-```bash
-docker compose logs connectwise-manage-mcp | grep "\[auth\]"
-```
+Check the `[auth]` log line for `tokenAudience`. Set `AZURE_AUDIENCE` in `.env` to exactly match that value (grep stderr / your process log for `[auth]`).
 
 **`AADSTS65001` — user has not consented / no role assigned**
 The user hasn't been assigned the `CWM.Access` app role. Complete Step 8 above.

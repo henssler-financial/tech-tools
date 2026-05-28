@@ -547,8 +547,8 @@ async function startHttpTransport(): Promise<void> {
     // Health check - shallow, unauthenticated liveness probe.
     // Must NOT call getCredentials() or any upstream: in gateway mode
     // credentials arrive per-request via X-KnowBe4-API-Key, so a
-    // credential-gated /health would always 503 and Azure's liveness
-    // probe would SIGTERM-kill the container.
+    // credential-gated /health would always 503 and trip upstream
+    // restart loops.
     if (url.pathname === "/health" || url.pathname === "/healthz") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ status: "ok" }));

@@ -26,8 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Billing (client usage, device usage)
 - Comprehensive error handling with proper MCP error mapping
 - Empty-result handling to prevent LLM hallucination
-- Docker containerization with multi-stage build
-- Health check endpoint for container orchestration
+- Health check endpoint
 - Type-safe implementation with Zod validation
 - OSS hygiene files (README, LICENSE, CONTRIBUTING, etc.)
 - GitHub Actions workflows for CI/CD

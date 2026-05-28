@@ -12,7 +12,6 @@ This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDU
 
 - Node.js 20 or higher
 - npm 10 or higher
-- Docker (for container testing)
 
 ### Development Setup
 
@@ -244,13 +243,6 @@ Test with a real Auvik API:
 # Set up your credentials in .env
 npm run build
 npm start
-```
-
-### Docker Testing
-
-```bash
-docker build -t auvik-mcp:test .
-docker run -e AUVIK_USERNAME=your_username -e AUVIK_API_KEY=your_key auvik-mcp:test
 ```
 
 ## Documentation

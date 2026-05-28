@@ -15,8 +15,6 @@ This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) serve
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/w159/connectwise-manage-mcp)
 
-For deploying to **Azure Container Apps** with Entra ID OAuth 2.1, see [AZURE_ACA_DEPLOYMENT.md](AZURE_ACA_DEPLOYMENT.md).
-
 ## Configuration
 
 ### Environment Variables
@@ -152,12 +150,6 @@ For a self-hosted instance:
     }
   }
 }
-```
-
-### With Docker
-
-```bash
-docker compose up -d
 ```
 
 ### HTTP Transport (Gateway Mode)

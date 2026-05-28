@@ -14,8 +14,8 @@ function startHttpServer(): void {
 
     // Shallow liveness probe — always 200 when the process is up.
     // In gateway mode credentials arrive per-request via headers, so a
-    // credential check here would always fail and incorrectly mark the
-    // container Unhealthy. Credential status is reported informationally.
+    // credential check here would always fail and incorrectly fail
+    // upstream health checks. Credential status is reported informationally.
     if (url.pathname === '/health' || url.pathname === '/healthz') {
       const creds = getCredentials();
       res.writeHead(200, { 'Content-Type': 'application/json' });

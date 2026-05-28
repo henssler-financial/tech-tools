@@ -13,8 +13,8 @@
 - **Transport**: Dual-mode — stdio (local/Claude Desktop) and Streamable HTTP (gateway)
 - **Auth modes**: Local (env vars) and Gateway (credentials injected via HTTP headers by the gateway proxy)
 - **Tool pattern**: Decision-tree — a navigation tool exposes domains first, then dynamically loads domain-specific tools to avoid overwhelming Claude with 20+ tools at once
-- **Packaging**: MCPB bundles (`.mcpb`) for one-click Claude Desktop install, Docker images for gateway deployment
-- **CI/CD**: GitHub Actions — CI on push, semantic-release on main, Docker build + MCPB upload on release
+- **Packaging**: MCPB bundles (`.mcpb`) for one-click Claude Desktop install
+- **CI/CD**: GitHub Actions — CI on push, semantic-release on main, MCPB upload on release
 - **Testing**: Jest with `ts-jest`
 
 ## Priority Areas (Review These)

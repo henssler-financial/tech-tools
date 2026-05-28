@@ -84,14 +84,14 @@
 
 ### Bug Fixes
 
-* **docker:** drop arm64 platform to fix QEMU build failures ([2c01732](https://github.com/w159/connectwise-manage-mcp/commit/2c01732ed3f4defc024dcddd95fba283ab92048c))
+* (no user-facing fixes — internal CI adjustments)
 
 # 1.0.0 (2026-02-17)
 
 
 ### Bug Fixes
 
-* add package-lock.json for npm ci in CI and Docker builds ([0fd9271](https://github.com/w159/connectwise-manage-mcp/commit/0fd927144f0261fd3d878d83d0c29646dd38c4ef))
+* add package-lock.json for npm ci in CI builds ([0fd9271](https://github.com/w159/connectwise-manage-mcp/commit/0fd927144f0261fd3d878d83d0c29646dd38c4ef))
 * **ci:** fix duplicate step IDs, use Node 22 for semantic-release, drop Node 18 ([9aa7f4c](https://github.com/w159/connectwise-manage-mcp/commit/9aa7f4cc0c37bab59abf3a3a33776264be870acc))
 * **ci:** remove npm cache (no package-lock.json in repo) ([d2e1c37](https://github.com/w159/connectwise-manage-mcp/commit/d2e1c3747728fbd1433f7eedb098b1c265606911))
 * **deps:** add semantic-release and plugin devDependencies ([ad815b3](https://github.com/w159/connectwise-manage-mcp/commit/ad815b31fb312ab71feaa9c0236e2ba4e20e8834))

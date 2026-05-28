@@ -404,7 +404,7 @@ async function startHttpTransport(): Promise<void> {
     // Health endpoint - shallow, unauthenticated liveness probe.
     // Must NOT call getCredentials() or any upstream: in gateway mode
     // credentials only arrive per-request via headers, so a credential
-    // check here would always 503 and crash-loop the container.
+    // check here would always 503 and trip upstream restart loops.
     if (url.pathname === "/health" || url.pathname === "/healthz") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ status: "ok" }));

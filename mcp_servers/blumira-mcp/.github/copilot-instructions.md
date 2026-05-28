@@ -10,8 +10,8 @@
 - **Transport**: Dual-mode — stdio (local/Claude Desktop) and Streamable HTTP (gateway)
 - **Auth**: Bearer JWT token via `BLUMIRA_JWT_TOKEN` env var or gateway header
 - **Tool pattern**: Decision-tree — navigation tool exposes domains first, then domain-specific tools
-- **Packaging**: MCPB bundles (`.mcpb`) for Claude Desktop, Docker images for gateway
-- **CI/CD**: GitHub Actions — test matrix, semantic-release, Docker build + MCPB upload
+- **Packaging**: MCPB bundles (`.mcpb`) for Claude Desktop
+- **CI/CD**: GitHub Actions — test matrix, semantic-release, MCPB upload
 - **Testing**: Vitest
 
 ## Priority Areas

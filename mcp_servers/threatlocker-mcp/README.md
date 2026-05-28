@@ -9,7 +9,6 @@ A Model Context Protocol (MCP) server that provides AI assistants with access to
 - **Gateway Mode**: Multi-tenant support via HTTP headers
 - **Elicitation Support**: Interactive prompts for missing parameters
 - **Comprehensive Error Handling**: Detailed error messages and logging
-- **Docker Support**: Production-ready containerization
 
 ## Tools
 
@@ -106,37 +105,6 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}' | npm start
 
 # HTTP mode
 curl http://localhost:8080/health
-```
-
-## Docker
-
-### Using Docker Compose
-
-```bash
-# Pull and run latest image
-docker compose up -d
-
-# Or build locally
-docker compose -f docker-compose.dev.yml up --build
-```
-
-### Using Docker directly
-
-```bash
-# Gateway mode (recommended)
-docker run -d \
-  --name threatlocker-mcp \
-  -p 8080:8080 \
-  -e AUTH_MODE=gateway \
-  ghcr.io/w159/threatlocker-mcp:latest
-
-# Stdio mode
-docker run -d \
-  --name threatlocker-mcp \
-  -e THREATLOCKER_API_KEY=your_key \
-  -e THREATLOCKER_ORGANIZATION_ID=your_org_id \
-  -e MCP_TRANSPORT=stdio \
-  ghcr.io/w159/threatlocker-mcp:latest
 ```
 
 ## Architecture

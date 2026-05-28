@@ -159,8 +159,6 @@ Each `mcp_servers/<vendor>-mcp/` package is a standalone TypeScript MCP server:
 ├── server.json           MCP server metadata (some vendors only)
 ├── package.json          Declares deps + scripts (build, pack, test)
 ├── tsconfig.json
-├── Dockerfile            Optional container build
-├── docker-compose.yml
 ├── <vendor>-mcp.mcpb     Pre-packed bundle ready for Claude Desktop
 ├── README.md             Vendor-specific setup
 ├── LICENSE
@@ -690,9 +688,6 @@ Yes. The `mcp_node/node-*` packages are plain TypeScript libraries with no Claud
 
 **Q: Why do the `dist/` folders get committed?**
 So pre-built `.mcpb` bundles are byte-reproducible and so a fresh clone can run `test-mcp-tools.mjs` without a build step.
-
-**Q: Is there a Docker option?**
-Yes — every server ships a `Dockerfile` + `docker-compose.yml`. The MCP stdio model isn't ideal in containers, but it's useful for HTTP-bridge gateways.
 
 **Q: How do I refresh the vendor docs?**
 The cloned vendor repos under `docs/vendors/*` are depth-1 clones. `git -C docs/vendors/<vendor>/<repo> pull` to update.

@@ -8,7 +8,6 @@ MCP server for the Auvik network monitoring API. This server provides tools to i
 - **Comprehensive API coverage** - 25+ tools covering all major Auvik API endpoints
 - **Transport flexibility** - Supports both HTTP and stdio transports
 - **Type-safe** - Built with TypeScript and Zod validation
-- **Docker ready** - Available as a containerized solution
 
 ## Tools Available
 
@@ -74,36 +73,6 @@ Credentials are provided via request headers:
 - `x-auvik-username`
 - `x-auvik-api-key`
 - `x-auvik-region` (optional)
-
-### Docker
-
-```bash
-# Pull from GitHub Container Registry
-docker pull ghcr.io/w159/auvik-mcp:latest
-
-# Run with environment variables
-docker run -d \
-  -p 8080:8080 \
-  -e AUVIK_USERNAME=your_username \
-  -e AUVIK_API_KEY=your_api_key \
-  -e AUVIK_REGION=us1 \
-  ghcr.io/w159/auvik-mcp:latest
-```
-
-### Docker Compose
-
-```yaml
-version: '3.8'
-services:
-  auvik-mcp:
-    image: ghcr.io/w159/auvik-mcp:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - AUVIK_USERNAME=your_username
-      - AUVIK_API_KEY=your_api_key
-      - AUVIK_REGION=us1
-```
 
 ### Local Development
 
@@ -178,7 +147,7 @@ The server implements comprehensive error handling:
 
 ## Health Check
 
-The server exposes a health endpoint at `/health` that always returns 200 OK. This endpoint does not require authentication and is suitable for container health checks.
+The server exposes a health endpoint at `/health` that always returns 200 OK. This endpoint does not require authentication and is suitable for liveness probes.
 
 ## Development
 

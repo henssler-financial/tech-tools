@@ -145,8 +145,7 @@ One new `CippService` unit-test file
 
 Single PR: service methods + handlers + definitions + tests + CHANGELOG
 entry. Conventional-commit `feat:`. CI green → squash-merge →
-semantic-release builds the image and deploys to Azure Container Apps via
-the existing Release pipeline.
+semantic-release publishes the new MCPB bundle via the existing Release pipeline.
 
 ## Out of scope (Phase 2)
 

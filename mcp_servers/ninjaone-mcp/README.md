@@ -82,13 +82,6 @@ Add to your Claude Desktop `claude_desktop_config.json`:
 }
 ```
 
-### Docker
-
-```bash
-docker build -t ninjaone-mcp .
-docker run -e NINJAONE_CLIENT_ID=xxx -e NINJAONE_CLIENT_SECRET=xxx -e NINJAONE_REGION=us ninjaone-mcp
-```
-
 ## Available Domains
 
 ### Devices

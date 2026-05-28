@@ -23,7 +23,7 @@ claude mcp add blumira-mcp \
   -- npx -y github:w159/blumira-mcp
 ```
 
-See [Installation](#installation) for Docker and from-source methods.
+See [Installation](#installation) for from-source method.
 
 ## Features
 
@@ -32,9 +32,8 @@ See [Installation](#installation) for Docker and from-source methods.
 - **🔍 Decision-Tree Navigation**: Start with `blumira_navigate` to explore domains, then dynamically load domain-specific tools
 - **🏢 MSP Multi-Tenant Support**: Full MSP endpoint coverage for managing findings, agents, and users across accounts
 - **🔒 Secure Authentication**: JWT token or API key (`pax8ApiTokenV1`) authentication
-- **🌐 Dual Transport**: Supports both stdio (local) and HTTP Streamable (remote/Docker) transports
+- **🌐 Dual Transport**: Supports both stdio (local) and HTTP Streamable (remote) transports
 - **📦 MCPB Packaging**: One-click installation via MCP Bundle for desktop clients
-- **🐳 Docker Ready**: Containerized deployment with HTTP transport and health checks
 - **⚡ Rate Limiting**: Built-in rate limiter respects Blumira API limits
 - **🔎 Rich Filtering**: Support for `.eq`, `.in`, `.gt`, `.lt`, `.contains`, `.regex`, and negation operators
 
@@ -56,22 +55,7 @@ claude mcp add blumira-mcp \
   -- npx -y github:w159/blumira-mcp
 ```
 
-### Option 2: Docker
-
-```bash
-docker compose up
-```
-
-Or pull the pre-built image:
-
-```bash
-docker run -d \
-  -e BLUMIRA_JWT_TOKEN=your-token \
-  -p 8080:8080 \
-  ghcr.io/w159/blumira-mcp:latest
-```
-
-### Option 3: From Source
+### Option 2: From Source
 
 ```bash
 git clone https://github.com/w159/blumira-mcp.git
@@ -115,16 +99,6 @@ name.contains=malware     # Substring match
 ```
 
 Pass filters as tool input parameters — the server handles query string construction.
-
-## Docker Deployment
-
-Copy `.env.example` to `.env` and fill in your credentials:
-
-```bash
-cp .env.example .env
-# Edit .env with your Blumira JWT token
-docker compose up -d
-```
 
 ## Development
 
